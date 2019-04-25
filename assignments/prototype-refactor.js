@@ -24,32 +24,42 @@ Prototype Refactor
  * destroy() // prototype method that returns: `${this.name} was removed from the game.`
  */
 
-const dimensions = { length: 'length', width: 'width', height: 'height' };
-
-function GameObject(attributes) {
-    this.createdAt = attributes.createdAt;
-    this.name = attributes.name;
-    this.dimensions = attributes.dimensions;
-}
-GameObject.prototype.destroy = function() {
-    return `${this.name} was removed from the game.`;
+const dimensions = {
+    length: 'length',
+    width: 'width',
+    height: 'height'
 };
-/*
-      === CharacterStats ===
-      * healthPoints
-      * takeDamage() // prototype method -> returns the string '<object name> took damage.'
-      * should inherit destroy() from GameObject's prototype
-    */
-function CharacterStats(childAtrributes) {
-    GameObject.call(this, childAtrributes);
-    this.healthPoints = childAtrributes.healthPoints;
-}
+class GameObject {
 
-CharacterStats.prototype = Object.create(GameObject.prototype);
+    constructor(attributes) {
+            this.createdAt = attributes.createdAt;
+            this.name = attributes.name;
+            this.dimensions = attributes.dimensions;
+        }
+        //methods
+    destroy() {
+        return `${this.name} was removed from the game.`;
+    };
+} //GameObject
 
-CharacterStats.prototype.takeDamage = function() {
-    return `${this.name} took damage.`;
-};
+
+/*   
+   === CharacterStats ===
+ * healthPoints
+ * takeDamage() // prototype method -> returns the string '<object name> took damage.'
+ * should inherit destroy() from GameObject's prototype
+ */
+class CharacterStats extends GameObject {
+    constructor(childAtrributes) {
+            super(childAtrributes);
+            this.healthPoints = childAtrributes.healthPoints;
+        }
+        //methods 
+    takeDamage() {
+        return `${this.name} took damage.`;
+    }
+} //CharacterStats
+
 /*
       === Humanoid (Having an appearance or character resembling that of a human.) ===
       * team
@@ -59,34 +69,46 @@ CharacterStats.prototype.takeDamage = function() {
       * should inherit destroy() from GameObject through CharacterStats
       * should inherit takeDamage() from CharacterStats
     */
-function Humanoid(humanattributes) {
-    CharacterStats.call(this, humanattributes);
-    this.team = humanattributes.team;
-    this.weapons = humanattributes.weapons;
-    this.language = humanattributes.language;
-}
-Humanoid.prototype = Object.create(CharacterStats.prototype);
-Humanoid.prototype.greet = function() {
-    return `${this.name} offers a greeting in ${this.language}.`;
-};
+class Humanoid extends CharacterStats {
+    constructor(humanattributes) {
+            super(humanattributes);
+            this.team = humanattributes.team;
+            this.weapons = humanattributes.weapons;
+            this.language = humanattributes.language;
+        }
+        //methods
+    greet() {
+        return `${this.name} offers a greeting in ${this.language}.`;
+    }
+} //Humanoid
+
 /*
  * Inheritance chain: GameObject -> CharacterStats -> Humanoid
  * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
  * Instances of CharacterStats should have all of the same properties as GameObject.
  */
-function Villain(villianattributes) {
-    Humanoid.call(this, villianattributes);
-}
-Villain.prototype = Object.create(Humanoid.prototype);
+class Villain extends Humanoid {
+    constructor(villianattributes) {
+            super(villianattributes);
+        }
+        //methods
+    critical(name, health) {
+        this.health -= 3;
+        return `${this.name} suffers a critical hit.`;
+    }
+} //Villian
 
-function Hero(heroattributes) {
-    Humanoid.call(this, heroattributes);
-}
-Hero.prototype = Object.create(Humanoid.prototype);
-Hero.prototype.critical = function(name, health) {
-    this.health -= 3;
-    return `${this.name} suffers a huge damage.`;
-};
+class Hero extends Humanoid {
+    constructor(heroattributes) {
+            super(heroattributes);
+        }
+        //methods
+    critical(name, health) {
+        this.health -= 3;
+        return `${this.name} suffers a critical hit.`;
+    }
+} //Hero
+
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
 const mage = new Humanoid({
